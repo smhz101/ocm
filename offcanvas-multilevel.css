@@ -1,0 +1,157 @@
+/* VARIABLES */
+/* If you change `breakpoint` in JS, update the CSS below to match */
+:root {
+	--ocm-bg: #111;
+	--ocm-text: #eee;
+	--ocm-header-bg: #222;
+	--ocm-border: #333;
+	--ocm-hover: rgba(255, 255, 255, 0.1);
+	--ocm-z: 9999;
+	--ocm-width: 80%;
+	--ocm-transition: transform 300ms ease;
+	--ocm-breakpoint: 768px;
+}
+
+/* 1) Native menu hidden & toggle shown under breakpoint */
+@media (max-width: var(--ocm-breakpoint)) {
+	.ocm-container .main-menu > ul {
+		display: none;
+	}
+	.ocm-toggle {
+		display: block !important;
+	}
+}
+/* 1b) Toggle hidden on larger */
+.ocm-toggle {
+	display: none;
+	z-index: var(--ocm-z);
+	background: none;
+	border: none;
+	padding: 0.5em;
+	cursor: pointer;
+}
+
+/* 2) Overlay */
+.ocm-container__overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: calc(var(--ocm-z)-1);
+	display: none;
+}
+
+/* 3) Panel */
+.ocm-panel {
+	position: fixed;
+	top: 130px;
+	bottom: 0;
+	right: 0; /* or left:0 */
+	width: var(--ocm-width);
+	background: var(--ocm-bg);
+	color: var(--ocm-text);
+	z-index: var(--ocm-z);
+	overflow: hidden;
+	transform: translateX(100%);
+	transition: var(--ocm-transition);
+}
+
+/* 4) Levels */
+.ocm-level {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow-y: auto;
+}
+
+/* 5) Header */
+.ocm-header {
+	display: flex;
+	align-items: center;
+	padding: 0.75em;
+	background: var(--ocm-header-bg);
+	border-bottom: 1px solid var(--ocm-border);
+	color: var(--ocm-text);
+}
+.ocm-header span {
+	flex: 1;
+	font-weight: 600;
+}
+
+/* 6) Close button */
+.ocm-close {
+	position: absolute;
+	top: 0.5em;
+	right: 0.5em;
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+.ocm-close svg {
+	width: 1em;
+	height: 1em;
+	stroke: var(--ocm-text);
+	fill: none;
+}
+
+/* 7) List & items */
+.ocm-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.ocm-item {
+	position: relative;
+	border-bottom: 1px solid var(--ocm-border);
+}
+.ocm-item.has-children {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	align-items: center;
+}
+
+/* 8) Links */
+.ocm-link {
+	display: block;
+	padding: 1em;
+	color: var(--ocm-text);
+	text-decoration: none;
+}
+.ocm-link:hover {
+	background: var(--ocm-hover);
+}
+
+/* 9) Parent toggles */
+.ocm-item.has-children .ocm-toggle {
+	display: inline-block;
+	float: right;
+	margin: 0.75em;
+}
+.ocm-toggle svg {
+	width: 1em;
+	height: 1em;
+	stroke: var(--ocm-text);
+	fill: none;
+}
+
+/* 10) Back & Home */
+.ocm-back,
+.ocm-home {
+	background: none;
+	border: none;
+	padding: 0.5em;
+	cursor: pointer;
+}
+
+.ocm-btn svg {
+	width: 1em;
+	height: 1em;
+	stroke: var(--ocm-text);
+	fill: none;
+}

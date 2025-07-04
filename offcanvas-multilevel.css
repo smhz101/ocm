@@ -1,3 +1,7 @@
+/*!
+ * jquery-offcanvas-menu.css v1.0.4 — “Super-Notch” styling
+ */
+
 /* VARIABLES */
 /* If you change `breakpoint` in JS, update the CSS below to match */
 :root {
@@ -10,6 +14,14 @@
 	--ocm-width: 80%;
 	--ocm-transition: transform 300ms ease;
 	--ocm-breakpoint: 768px;
+	--header-padding: 0.75rem;
+	--header-base-height: 50px;
+
+	--ocm-icon-size: 1.75rem;
+	--ocm-header-font-size: 1rem;
+	--ocm-header-font-weight: 600;
+	--ocm-header-gap: 0.5rem;
+	--ocm-btn-spacing: 0.5rem;
 }
 
 /* 1) Native menu hidden & toggle shown under breakpoint */
@@ -27,7 +39,7 @@
 	z-index: var(--ocm-z);
 	background: none;
 	border: none;
-	padding: 0.5em;
+	padding: 0.5rem;
 	cursor: pointer;
 }
 
@@ -45,8 +57,9 @@
 
 /* 3) Panel */
 .ocm-panel {
+	display: block;
 	position: fixed;
-	top: 130px;
+	top: 0;
 	bottom: 0;
 	right: 0; /* or left:0 */
 	width: var(--ocm-width);
@@ -61,8 +74,12 @@
 /* 4) Levels */
 .ocm-level {
 	position: absolute;
-	top: 0;
+	top: calc(
+		var(--header-base-height) + var(--header-padding) + var(--header-padding)
+	);
 	left: 0;
+	right: 0;
+	bottom: 0;
 	width: 100%;
 	height: 100%;
 	overflow-y: auto;
@@ -70,9 +87,11 @@
 
 /* 5) Header */
 .ocm-header {
+	height: var(--header-base-height);
+	z-index: 1;
 	display: flex;
 	align-items: center;
-	padding: 0.75em;
+	padding: var(--header-padding);
 	background: var(--ocm-header-bg);
 	border-bottom: 1px solid var(--ocm-border);
 	color: var(--ocm-text);
@@ -84,16 +103,13 @@
 
 /* 6) Close button */
 .ocm-close {
-	position: absolute;
-	top: 0.5em;
-	right: 0.5em;
 	background: none;
 	border: none;
 	cursor: pointer;
 }
 .ocm-close svg {
-	width: 1em;
-	height: 1em;
+	width: 1rem;
+	height: 1rem;
 	stroke: var(--ocm-text);
 	fill: none;
 }
@@ -110,16 +126,28 @@
 }
 .ocm-item.has-children {
 	display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
-	justify-content: space-between;
 	align-items: center;
+}
+
+.ocm-link {
+	flex-grow: 1;
+	text-decoration: none;
+}
+
+.ocm-btn {
+	margin-left: auto;
+	background: none;
+	border: none;
+	padding: var(--ocm-btn-spacing);
+	cursor: pointer;
+	width: calc(var(--ocm-icon-size) + 1rem);
+	height: calc(var(--ocm-icon-size) + 1rem);
 }
 
 /* 8) Links */
 .ocm-link {
 	display: block;
-	padding: 1em;
+	padding: calc(var(--header-padding) + var(--header-padding));
 	color: var(--ocm-text);
 	text-decoration: none;
 }
@@ -131,11 +159,11 @@
 .ocm-item.has-children .ocm-toggle {
 	display: inline-block;
 	float: right;
-	margin: 0.75em;
+	margin: var(--header-padding);
 }
 .ocm-toggle svg {
-	width: 1em;
-	height: 1em;
+	width: 1rem;
+	height: 1rem;
 	stroke: var(--ocm-text);
 	fill: none;
 }
@@ -145,13 +173,13 @@
 .ocm-home {
 	background: none;
 	border: none;
-	padding: 0.5em;
+	padding: 0.5rem;
 	cursor: pointer;
 }
 
 .ocm-btn svg {
-	width: 1em;
-	height: 1em;
-	stroke: var(--ocm-text);
-	fill: none;
+	width: var(--ocm-icon-size);
+	height: var(--ocm-icon-size);
+	stroke: none;
+	fill: var(--ocm-text);
 }

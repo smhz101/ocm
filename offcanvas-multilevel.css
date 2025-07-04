@@ -1,9 +1,22 @@
 /*!
- * jquery-offcanvas-menu.css v1.0.4 — “Super-Notch” styling
+ * Off-Canvas Multi-Level Menu (OCM) CSS
+ * File:       offcanvas-multilevel.css
+ * Version:    1.0.5
+ * Codename:   "Super-Notch"
+ *
+ * Description:
+ * Core styling for jQuery Off-Canvas Multi-Level Menu plugin.
+ * Responsive, accessible, and fully customizable mobile-first menu system.
+ *
+ * Author:     Muzammil Hussain (https://github.com/smhz101)
+ * License:    MIT
+ * Repository: https://github.com/smhz101/ocm
  */
 
 /* VARIABLES */
+
 /* If you change `breakpoint` in JS, update the CSS below to match */
+
 :root {
 	--ocm-bg: #111;
 	--ocm-text: #eee;

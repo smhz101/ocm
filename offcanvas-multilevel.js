@@ -1,6 +1,34 @@
 /*!
- * jQuery Off-Canvas Multi-Level Menu v1.0.4
- * https://github.com/smhz101/ocm
+ * jQuery Off-Canvas Multi-Level Menu (OCM)
+ * Version:     1.0.5
+ * Author:      Muzamiml Hussain (smhz101)
+ * License:     MIT
+ * Repository:  https://github.com/smhz101/ocm
+ *
+ * Description:
+ * Lightweight, accessible, responsive off-canvas navigation menu.
+ * Supports unlimited submenu levels, keyboard navigation, focus trapping,
+ * ARIA attributes, and highly customizable styling.
+ *
+ * Features:
+ * - Responsive panel with breakpoint control
+ * - Multi-level nested menus with animated transitions
+ * - Focus trapping, ESC-to-close, ARIA-compliant
+ * - Overlay and click-to-close support
+ * - Easily themable via JS or CSS custom properties
+ * - API methods for open, close, toggle, and level navigation
+ * - Lifecycle callbacks for integration flexibility
+ *
+ * Dependencies:
+ * - jQuery >= 3.6.0
+ *
+ * Usage:
+ * $('.main-menu').offCanvasMenu({
+ *   side: 'left',
+ *   width: '75%',
+ *   breakpoint: '992px'
+ * });
+ *
  */
 (function ($) {
   'use strict';

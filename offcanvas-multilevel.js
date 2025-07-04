@@ -1,5 +1,5 @@
 /*!
- * Off-Canvas Multi-Level Menu v1.0.4
+ * jQuery Off-Canvas Multi-Level Menu v1.0.4
  * https://github.com/smhz101/ocm
  */
 (function ($) {
@@ -93,9 +93,9 @@
     this.menuData = parse(this.$nav.find('> ul'));
   };
 
-  /* 2) Build wrapper, toggle, overlay, panel, levels */
   OffCanvasMenu.prototype._buildDOM = function () {
     var s = this.settings;
+
     // wrap + hide original
     this.$nav.wrap('<div class="' + s.containerClass + '"></div>').hide();
 
@@ -111,7 +111,7 @@
       this.$overlay = $('<div class="' + s.containerClass + '__overlay"></div>')
         .css({
           position: 'fixed',
-          top: '130px',
+          top: 0,
           left: 0,
           right: 0,
           bottom: 0,
@@ -122,13 +122,13 @@
         .appendTo('body');
     }
 
-    // panel
+    // panel wrapper
     this.$panel = $(
       '<nav role="navigation" aria-hidden="true" tabindex="-1" class="' + s.panelClass + '"></nav>'
     )
       .css({
         position: 'fixed',
-        top: '130px',
+        top: 0,
         bottom: 0,
         [s.side]: 0,
         width: s.width,
@@ -141,54 +141,19 @@
       })
       .appendTo('body');
 
-    // close btn
-    $('<button>')
-      .addClass(s.btnClass + ' ' + s.btnCloseClass)
-      .attr('aria-label', 'Close menu')
-      .html(s.svg.close)
-      .appendTo(this.$panel);
-
-    // render level 0
-    this._renderLevel(0, this.menuData);
-  };
-
-  /* 3) Render one level pane */
-  OffCanvasMenu.prototype._renderLevel = function (level, items, parentTitle) {
-    var s = this.settings;
-    var initialOffset = level * 100;
-
-    // Create pane
-    var $lvl = $('<div>')
-      .addClass(s.levelClass)
-      .attr('data-level', level)
-      .css({
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        overflowY: 'auto',
-        transform: 'translateX(' + initialOffset + '%)',
-        transition: 'transform ' + s.transitionDuration + 'ms ' + s.transitionEasing,
-      });
-
-    // 1) HEADER (always injected)
-    var $hdr = $('<div>').addClass(s.headerClass).appendTo($lvl);
+    // FIXED HEADER: only one, not per‐level
+    this.$header = $('<div>').addClass(s.headerClass).appendTo(this.$panel);
 
     // Home button
     $('<button>')
       .addClass(s.btnClass + ' ' + s.btnHomeClass)
       .attr('aria-label', 'Back to top level')
       .html(s.svg.home)
-      .on(
-        'click',
-        function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.jumpTo(0);
-        }.bind(this)
-      )
-      .appendTo($hdr);
+      .on('click', (e) => {
+        e.preventDefault();
+        this.jumpTo(0);
+      })
+      .appendTo(this.$header);
 
     // Back button
     $('<button>')
@@ -196,28 +161,44 @@
       .attr('aria-label', 'Back one level')
       .html(s.svg.chevron)
       .css('transform', 'rotate(180deg)')
-      .on(
-        'click',
-        function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.back();
-        }.bind(this)
-      )
-      .appendTo($hdr);
+      .on('click', (e) => {
+        e.preventDefault();
+        this.back();
+      })
+      .appendTo(this.$header);
 
-    // Title
-    $('<span>')
+    // Title span
+    this.$title = $('<span>')
       .addClass(s.headerClass + '__title')
-      .text(level === 0 ? 'Menu' : parentTitle)
-      .appendTo($hdr);
+      .text('Menu')
+      .appendTo(this.$header);
 
-    // 2) LIST
+    $('<button>')
+      .addClass(s.btnClass + ' ' + s.btnCloseClass)
+      .attr('aria-label', 'Close menu')
+      .html(s.svg.close)
+      .on('click', () => this.close())
+      .appendTo(this.$header);
+
+    // render level 0
+    this._renderLevel(0, this.menuData);
+  };
+
+  /* 3) Render one level pane */
+  OffCanvasMenu.prototype._renderLevel = function (level, items) {
+    var s = this.settings,
+      offset = level * 100;
+
+    // pane container
+    var $lvl = $('<div>').addClass(s.levelClass).attr('data-level', level).css({
+      /* transform: translateX(offset%), ... */
+    });
+
+    // LIST only
     var $list = $('<ul>').addClass(s.listClass);
     items.forEach(function (it) {
       var $li = $('<li>').addClass(s.itemClass).appendTo($list),
         $a = $('<a>').addClass(s.linkClass).attr('href', it.url).text(it.title).appendTo($li);
-
       if (it.children.length) {
         $li.addClass('has-children');
         $('<button>')
@@ -227,9 +208,8 @@
           .appendTo($li);
       }
     });
-
     $lvl.append($list).appendTo(this.$panel);
-    this.stack[level] = { $lvl: $lvl, items: items, title: parentTitle };
+    this.stack[level] = { $lvl: $lvl, items: items };
   };
 
   /* 3.1) Remove rendered level pane */
@@ -311,18 +291,21 @@
 
   /* Navigate into submenu */
   OffCanvasMenu.prototype._navigate = function (level, items, title) {
-    // 1) Clear out _only_ that level and deeper
+    // 1) Clear out only this level and deeper
     for (let i = this.stack.length - 1; i >= level; i--) {
       this._removeLevel(i);
     }
 
-    // 2) Render a fresh pane for this level
-    this._renderLevel(level, items, title);
+    // 2) Render a fresh pane for this level (list only; header is fixed)
+    this._renderLevel(level, items);
 
-    // 3) Slide into it
+    // 3) Slide into it so content moves under the fixed header
     this._slide(level);
 
-    // 4) Callbacks
+    // 4) Update the fixed header title
+    this._updateHeader(title || 'Menu');
+
+    // 5) Callbacks
     if ($.isFunction(this.settings.onNavigate)) this.settings.onNavigate(level, items);
     if ($.isFunction(this.settings.onLevelChange)) this.settings.onLevelChange(level);
   };
@@ -354,11 +337,18 @@
   /* Jump to root */
   OffCanvasMenu.prototype.jumpTo = function (level) {
     if (level === 0) {
-      this._reset(); // remove everything above level 0
+      this._reset();
       this._slide(0);
+      this._updateHeader('Menu');
     } else {
       this._slide(level);
+      this._updateHeader(this.stack[level].title);
     }
+  };
+
+  // helper to change header text
+  OffCanvasMenu.prototype._updateHeader = function (text) {
+    this.$title.text(text);
   };
 
   /* Detect current level */

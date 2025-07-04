@@ -1,6 +1,6 @@
 /*!
  * jQuery Off-Canvas Multi-Level Menu (OCM)
- * Version:     1.0.5
+ * Version:     1.1.0
  * Author:      Muzamiml Hussain (smhz101)
  * License:     MIT
  * Repository:  https://github.com/smhz101/ocm
@@ -30,9 +30,45 @@
  * });
  *
  */
-(function ($) {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(['jquery'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // CommonJS
+    module.exports = factory(require('jquery'));
+  } else {
+    // Browser globals
+    factory(root.jQuery);
+  }
+})(typeof self !== 'undefined' ? self : this, function ($) {
   'use strict';
 
+  /**
+   * @typedef {Object} OffCanvasMenuSettings
+   * @property {'left'|'right'} side
+   * @property {string} width
+   * @property {string} breakpoint
+   * @property {number} zIndex
+   * @property {string} bgColor
+   * @property {string} textColor
+   * @property {string} headerBg
+   * @property {string} borderColor
+   * @property {string} linkHover
+   * @property {number} transitionDuration
+   * @property {string} transitionEasing
+   * @property {boolean} overlay
+   * @property {boolean} trapFocus
+   * @property {boolean} closeOnEsc
+   * @property {boolean} closeOnOverlay
+   * @property {string} navSelector
+   * @property {Object} svg
+   * @property {Function|null} onInit
+   * @property {Function|null} onOpen
+   * @property {Function|null} onClose
+   * @property {Function|null} onNavigate
+   * @property {Function|null} onLevelChange
+   */
   var defaults = {
     side: 'right', // 'left' or 'right'
     width: '80%', // CSS width of panel
@@ -83,6 +119,12 @@
     onLevelChange: null, // fn(level)
   };
 
+  /**
+   * OffCanvasMenu constructor
+   * @class
+   * @param {JQuery} $nav
+   * @param {Partial<OffCanvasMenuSettings>} opts
+   */
   function OffCanvasMenu($nav, opts) {
     this.settings = $.extend(true, {}, defaults, opts);
     this.$nav = $nav;
@@ -98,7 +140,10 @@
     if ($.isFunction(this.settings.onInit)) this.settings.onInit(this);
   }
 
-  /* 1) Parse the WP menu into a JS tree */
+  /**
+   * Parse the source UL into a JS tree
+   * @private
+   */
   OffCanvasMenu.prototype._buildTree = function () {
     const parse = ($ul) => {
       return $ul
@@ -121,6 +166,10 @@
     this.menuData = parse(this.$nav.find('> ul'));
   };
 
+  /**
+   * Build DOM elements: container, header, levels
+   * @private
+   */
   OffCanvasMenu.prototype._buildDOM = function () {
     var s = this.settings;
 
@@ -218,9 +267,7 @@
       offset = level * 100;
 
     // pane container
-    var $lvl = $('<div>').addClass(s.levelClass).attr('data-level', level).css({
-      /* transform: translateX(offset%), ... */
-    });
+    var $lvl = $('<div>').addClass(s.levelClass).attr('data-level', level);
 
     // LIST only
     var $list = $('<ul>').addClass(s.listClass);
@@ -255,7 +302,10 @@
     }
   };
 
-  /* 4) Event bindings */
+  /**
+   * Bind all event handlers
+   * @private
+   */
   OffCanvasMenu.prototype._bindEvents = function () {
     var s = this.settings,
       self = this;
@@ -314,7 +364,10 @@
     if (e.key === 'Escape') this.close();
   };
 
-  /* Open panel */
+  /**
+   * Open the off-canvas panel
+   * @public
+   */
   OffCanvasMenu.prototype.open = function () {
     this.$panel.attr('aria-hidden', 'false').css('transform', 'translateX(0)');
     if (this.$overlay) this.$overlay.show();
@@ -322,7 +375,10 @@
     this.$panel.focus();
   };
 
-  /* Close panel */
+  /**
+   * Close the off-canvas panel
+   * @public
+   */
   OffCanvasMenu.prototype.close = function () {
     this.$panel.attr('aria-hidden', 'true').css('transform', 'translateX(100%)');
     if (this.$overlay) this.$overlay.hide();
@@ -331,12 +387,21 @@
     // this._updateVisibility();
   };
 
-  /* Toggle */
+  /**
+   * Toggle panel open/close
+   * @public
+   */
   OffCanvasMenu.prototype.toggle = function () {
     this.$panel.attr('aria-hidden') === 'true' ? this.open() : this.close();
   };
 
-  /* Navigate into submenu */
+  /**
+   * Navigate into a submenu level
+   * @private
+   * @param {number} level
+   * @param {Array<Object>} items
+   * @param {string} title
+   */
   OffCanvasMenu.prototype._navigate = function (level, items, title) {
     // 1) Clear out only this level and deeper
     for (let i = this.stack.length - 1; i >= level; i--) {
@@ -381,7 +446,11 @@
     }
   };
 
-  /* Jump to root */
+  /**
+   * Jump to a specific level
+   * @public
+   * @param {number} level
+   */
   OffCanvasMenu.prototype.jumpTo = function (level) {
     if (level === 0) {
       this._reset();
@@ -438,7 +507,11 @@
     }
   };
 
-  /* jQuery bridge */
+  /**
+   * jQuery plugin bridge
+   * @param {Partial<OffCanvasMenuSettings>} opts
+   * @returns {JQuery}
+   */
   $.fn.offCanvasMenu = function (opts) {
     return this.each(function () {
       if (!$.data(this, 'offCanvasMenu')) {
@@ -446,4 +519,6 @@
       }
     });
   };
-})(jQuery);
+
+  return OffCanvasMenu;
+});

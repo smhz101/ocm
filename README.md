@@ -136,15 +136,23 @@ You can hook into lifecycle events via options:
 
 ## Changelog
 
-### v1.0.5 – 2025-07-05
+## v1.1.0 – 2025-07-05
 
-- 🐛 Fixed bug where anchor links to same-page `#hash` targets were not working correctly inside the menu
+### Added
+
+- UMD wrapper supporting AMD, CommonJS & browser globals
+- TypeScript definitions (`.d.ts`)
+- JSDoc comments for most public/private methods and settings
+
+#### v1.0.5 – 2025-07-05
+
+- Fixed bug where anchor links to same-page `#hash` targets were not working correctly inside the menu
   - Anchor clicks with `href="#..."` now correctly close the menu and allow smooth scroll behavior
 - Added full `README.md` with usage, configuration, methods, events, accessibility, and theming documentation
   - Includes installation instructions, API table, live code examples, and customization options
 - Minor code cleanup in `_bindEvents` to improve readability and scope usage
 
-### v1.0.4 – 2025-07-04
+#### v1.0.4 – 2025-07-04
 
 - Initial stable release
 - Multi-level submenu support
@@ -152,7 +160,7 @@ You can hook into lifecycle events via options:
 - Overlay and click-to-close
 - Callback event support
 
-### v1.0.3 – 2025-07-04
+#### v1.0.3 – 2025-07-04
 
 - Added focus trap for accessibility
 - Implemented `onLevelChange` event callback
@@ -160,14 +168,14 @@ You can hook into lifecycle events via options:
 - Added support for `aria-hidden` toggling
 - Bugfix: overlay not closing on mobile Safari
 
-### v1.0.2 – 2025-07-04
+#### v1.0.2 – 2025-07-04
 
 - Introduced animated sliding transitions
 - Added support for custom panel width per breakpoint
 - Included optional home button in submenu headers
 - Bugfix: broken submenu detection in deeply nested lists
 
-### v1.0.1 – 2025-07-03
+#### v1.0.1 – 2025-07-03
 
 - Basic off-canvas panel structure with jQuery
 - Toggle menu via `.open()`, `.close()`, `.toggle()`

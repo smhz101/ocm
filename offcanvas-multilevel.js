@@ -256,6 +256,25 @@
     this.$panel.on('click', '.' + s.btnBackClass, () => this.back());
     this.$panel.on('click', '.' + s.btnHomeClass, () => this.jumpTo(0));
 
+    this.$panel.on('click', 'a', function (e) {
+      var href = $(this).attr('href');
+      if (!href || href.indexOf('#') === -1) return;
+
+      // Construct a URL relative to the site origin:
+      var url;
+      try {
+        url = new URL(href, location.origin);
+      } catch (err) {
+        return;
+      }
+
+      // If the link’s path is the same as current page, and has a hash
+      if (url.pathname === location.pathname && url.hash) {
+        // let the browser scroll, but close the menu immediately
+        self.close();
+      }
+    });
+
     // trap focus & keyboard
     if (s.trapFocus) {
       this.$panel.on('keydown', this._trapFocus.bind(this));

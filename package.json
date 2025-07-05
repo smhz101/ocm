@@ -1,0 +1,35 @@
+{
+  "name": "ocm",
+  "version": "1.2.0",
+  "description": "Lightweight, accessible off-canvas multi-level menu for jQuery",
+  "main": "dist/offcanvas-multilevel.umd.js",
+  "module": "dist/offcanvas-multilevel.esm.js",
+  "types": "offcanvas-multilevel.d.ts",
+  "files": [
+    "dist/",
+    "offcanvas-multilevel.css",
+    "offcanvas-multilevel.d.ts"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smhz101/ocm.git"
+  },
+  "author": "Muzammil Hussain <sayhi@muzammil.dev>",
+  "license": "MIT",
+  "peerDependencies": {
+    "jquery": ">=3.6.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "jest": "^29.7.0",
+    "jquery": "^3.7.1",
+    "jsdom": "^22.1.0",
+    "rollup": "^3.0.0"
+  }
+}

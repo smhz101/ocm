@@ -136,9 +136,22 @@ You can hook into lifecycle events via options:
 
 ## Changelog
 
-## v1.1.0 – 2025-07-05
+## 1.2.0 – 2025-07-05
 
 ### Added
+
+- Jest-based unit tests covering core methods (`open`, `close`, `toggle`, same-page anchor handling).
+- Deep-nested navigation tests verifying `_navigate`, `_removeLevel`, `_reset` and `jumpTo` behavior across 5 levels.
+
+### Changed
+
+- Refactored test suites to invoke private navigation methods directly, removing async helpers for synchronous assertions.
+
+### Fixed
+
+- Adjusted test expectations to match actual `stack` and header-update logic.
+
+#### v1.1.0 – 2025-07-05
 
 - UMD wrapper supporting AMD, CommonJS & browser globals
 - TypeScript definitions (`.d.ts`)

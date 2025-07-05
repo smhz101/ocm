@@ -1,6 +1,6 @@
 /*!
  * jQuery Off-Canvas Multi-Level Menu (OCM)
- * Version:     1.2.1
+ * Version:     1.3.0
  * Author:      Muzamiml Hussain (smhz101)
  * License:     MIT
  * Repository:  https://github.com/smhz101/ocm
@@ -46,6 +46,7 @@
 
   /**
    * @typedef {Object} OffCanvasMenuSettings
+   * @property {'slide'|'accordion'} mode
    * @property {'left'|'right'} side
    * @property {string} width
    * @property {string} breakpoint
@@ -70,6 +71,7 @@
    * @property {Function|null} onLevelChange
    */
   var defaults = {
+    mode: 'slide', // 'slide' or 'accordion'
     side: 'right', // 'left' or 'right'
     width: '80%', // CSS width of panel
     breakpoint: '768px', // must match CSS media-query
@@ -109,6 +111,8 @@
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>',
       chevron:
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>',
+      chevronDown:
+        '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"></path></svg>',
     },
 
     // Callbacks
@@ -173,6 +177,11 @@
   OffCanvasMenu.prototype._buildDOM = function () {
     var s = this.settings;
 
+    // tag mode on container for easy styling
+    this.$nav
+      .parent(`.${s.containerClass}`)
+      .addClass(s.mode === 'accordion' ? 'ocm-accordion' : 'ocm-slide');
+
     // wrap + hide original
     this.$nav.wrap('<div class="' + s.containerClass + '"></div>').hide();
 
@@ -218,51 +227,95 @@
       })
       .appendTo('body');
 
-    // FIXED HEADER: only one, not per‐level
-    this.$header = $('<div>').addClass(s.headerClass).appendTo(this.$panel);
+    // only build header for slide mode
+    if (s.mode === 'slide') {
+      this.$header = $('<div>').addClass(s.headerClass).appendTo(this.$panel);
 
-    // Home button
-    $('<button>')
-      .addClass(s.btnClass + ' ' + s.btnHomeClass)
-      .attr('aria-label', 'Back to top level')
-      .html(s.svg.home)
-      .on('click', (e) => {
-        e.preventDefault();
-        this.jumpTo(0);
-      })
-      .appendTo(this.$header);
+      // Home button
+      $('<button>')
+        .addClass(s.btnClass + ' ' + s.btnHomeClass)
+        .attr('aria-label', 'Back to top level')
+        .html(s.svg.home)
+        .on('click', (e) => {
+          e.preventDefault();
+          this.jumpTo(0);
+        })
+        .appendTo(this.$header);
 
-    // Back button
-    $('<button>')
-      .addClass(s.btnClass + ' ' + s.btnBackClass)
-      .attr('aria-label', 'Back one level')
-      .html(s.svg.chevron)
-      .css('transform', 'rotate(180deg)')
-      .on('click', (e) => {
-        e.preventDefault();
-        this.back();
-      })
-      .appendTo(this.$header);
+      // Back button
+      $('<button>')
+        .addClass(s.btnClass + ' ' + s.btnBackClass)
+        .attr('aria-label', 'Back one level')
+        .html(s.svg.chevron)
+        .css('transform', 'rotate(180deg)')
+        .on('click', (e) => {
+          e.preventDefault();
+          this.back();
+        })
+        .appendTo(this.$header);
 
-    // Title span
-    this.$title = $('<span>')
-      .addClass(s.headerClass + '__title')
-      .text('Menu')
-      .appendTo(this.$header);
+      // Title span
+      this.$title = $('<span>')
+        .addClass(s.headerClass + '__title')
+        .text('Menu')
+        .appendTo(this.$header);
 
-    $('<button>')
-      .addClass(s.btnClass + ' ' + s.btnCloseClass)
-      .attr('aria-label', 'Close menu')
-      .html(s.svg.close)
-      .on('click', () => this.close())
-      .appendTo(this.$header);
+      $('<button>')
+        .addClass(s.btnClass + ' ' + s.btnCloseClass)
+        .attr('aria-label', 'Close menu')
+        .html(s.svg.close)
+        .on('click', () => this.close())
+        .appendTo(this.$header);
+    }
 
-    // render level 0
-    this._renderLevel(0, this.menuData);
+    // render menu body
+    if (s.mode === 'accordion') {
+      this._renderAccordion(this.menuData, this.$panel);
+    } else {
+      this._renderLevel(0, this.menuData, 'Menu');
+    }
+  };
+
+  /**
+   * Render an in-place accordion.
+   * @private
+   * @param {Array<Object>} items
+   * @param {JQuery} $container
+   */
+  OffCanvasMenu.prototype._renderAccordion = function (items, $container) {
+    var s = this.settings;
+    var $ul = $('<ul>').addClass(s.listClass).appendTo($container);
+
+    items.forEach(function (it) {
+      var $li = $('<li>').addClass(s.itemClass).appendTo($ul),
+        $a = $('<a>').addClass(s.linkClass).attr('href', it.url).text(it.title).appendTo($li);
+
+      if (it.children.length) {
+        // 3a) Chevron toggle button
+        var $btn = $('<button>')
+          .addClass(s.btnClass + ' ' + s.btnToggleClass)
+          .attr('aria-expanded', 'false')
+          .attr('aria-label', 'Toggle submenu')
+          .html(s.svg.chevronDown)
+          .appendTo($li)
+          .on('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var expanded = $btn.attr('aria-expanded') === 'true';
+            $btn.attr('aria-expanded', String(!expanded));
+            $li.toggleClass('expanded');
+            $li.children('ul').first().slideToggle(s.transitionDuration);
+          });
+
+        // 3b) Render children, hidden by default
+        this._renderAccordion(it.children, $li);
+        $li.children('ul').first().hide();
+      }
+    }, this);
   };
 
   /* 3) Render one level pane */
-  OffCanvasMenu.prototype._renderLevel = function (level, items) {
+  OffCanvasMenu.prototype._renderLevel = function (level, items, parentTitle) {
     var s = this.settings,
       offset = level * 100;
 
@@ -284,7 +337,8 @@
       }
     });
     $lvl.append($list).appendTo(this.$panel);
-    this.stack[level] = { $lvl: $lvl, items: items };
+    // this.stack[level] = { $lvl: $lvl, items: items };
+    this.stack[level] = { $lvl: $lvl, items: items, title: parentTitle || 'Menu' };
   };
 
   /* 3.1) Remove rendered level pane */
@@ -330,10 +384,6 @@
       self._navigate(lvl + 1, item.children, item.title);
     });
 
-    // back + home
-    this.$panel.on('click', '.' + s.btnBackClass, () => this.back());
-    this.$panel.on('click', '.' + s.btnHomeClass, () => this.jumpTo(0));
-
     this.$panel.on('click', 'a', function (e) {
       var href = $(this).attr('href');
       if (!href || href.indexOf('#') === -1) return;
@@ -369,7 +419,8 @@
    * @public
    */
   OffCanvasMenu.prototype.open = function () {
-    this.$panel.attr('aria-hidden', 'false').css('transform', 'translateX(0)');
+    // remove inert so focusable again
+    this.$panel.removeAttr('aria-hidden').removeAttr('inert').css('transform', 'translateX(0)');
     if (this.$overlay) this.$overlay.show();
     if ($.isFunction(this.settings.onOpen)) this.settings.onOpen(this);
     this.$panel.focus();
@@ -380,11 +431,17 @@
    * @public
    */
   OffCanvasMenu.prototype.close = function () {
-    this.$panel.attr('aria-hidden', 'true').css('transform', 'translateX(100%)');
+    // this.$panel.attr('aria-hidden', 'true').css('transform', 'translateX(100%)');
+    // if (this.$overlay) this.$overlay.hide();
+    // this.jumpTo(0);
+    // if ($.isFunction(this.settings.onClose)) this.settings.onClose(this);
+    // // this._updateVisibility();
+
+    // use inert instead of aria-hidden to avoid hiding focused descendant
+    this.$panel.attr('aria-hidden', 'true').attr('inert', '').css('transform', 'translateX(100%)');
     if (this.$overlay) this.$overlay.hide();
     this.jumpTo(0);
     if ($.isFunction(this.settings.onClose)) this.settings.onClose(this);
-    // this._updateVisibility();
   };
 
   /**
@@ -409,7 +466,7 @@
     }
 
     // 2) Render a fresh pane for this level (list only; header is fixed)
-    this._renderLevel(level, items);
+    this._renderLevel(level, items, title);
 
     // 3) Slide into it so content moves under the fixed header
     this._slide(level);
@@ -435,14 +492,16 @@
     //   .attr('aria-hidden', (i) => (i === activeLevel ? 'false' : 'true'));
   };
 
-  /* Back one level */
+  /**
+   * Go back one level in the menu
+   * @private
+   */
   OffCanvasMenu.prototype.back = function () {
-    var lvl = this._currentLevel();
-    if (lvl > 0) {
-      // 1) Remove the current (deepest) pane
-      this._removeLevel(lvl);
-      // 2) Slide back into the previous one
-      this._slide(lvl - 1);
+    if (this.stack.length > 1) {
+      this.stack.pop().$lvl.remove();
+      const lvl = this.stack.length - 1;
+      this._slide(lvl);
+      this._updateHeader(this.stack[lvl].title || 'Menu');
     }
   };
 
@@ -455,7 +514,10 @@
     if (level === 0) {
       this._reset();
       this._slide(0);
-      this._updateHeader('Menu');
+      // this._updateHeader('Menu');
+      if (this.settings.mode === 'slide') {
+        this._updateHeader(level === 0 ? 'Menu' : this.stack[level].title);
+      }
     } else {
       this._slide(level);
       this._updateHeader(this.stack[level].title);
@@ -464,7 +526,10 @@
 
   // helper to change header text
   OffCanvasMenu.prototype._updateHeader = function (text) {
-    this.$title.text(text);
+    // only update if we actually have a $title element
+    if (this.$title && $.isFunction(this.$title.text)) {
+      this.$title.text(text);
+    }
   };
 
   /* Detect current level */

@@ -203,3 +203,6 @@ _MIT License_
 ## Keywords
 
 `jquery`, `off-canvas`, `menu`, `mobile`, `navigation`, `multi-level`, `responsive`, `a11y`, `accessibility`, `hamburger`, `slide`, `side menu`, `plugin`, `nested`, `drawer`, `touch`
+
+[![npm version](https://img.shields.io/npm/v/@smhz101/ocm.svg)](https://www.npmjs.com/package/@smhz101/ocm)
+[![license](https://img.shields.io/npm/l/@smhz101/ocm.svg)](LICENSE)

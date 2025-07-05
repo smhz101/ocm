@@ -10706,7 +10706,7 @@ function requireJquery () {
 
 /*!
  * jQuery Off-Canvas Multi-Level Menu (OCM)
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      Muzamiml Hussain (smhz101)
  * License:     MIT
  * Repository:  https://github.com/smhz101/ocm

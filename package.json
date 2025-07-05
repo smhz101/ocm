@@ -1,10 +1,28 @@
 {
-  "name": "ocm",
-  "version": "1.2.0",
+  "name": "@smhz101/ocm",
+  "version": "1.2.1",
   "description": "Lightweight, accessible off-canvas multi-level menu for jQuery",
   "main": "dist/offcanvas-multilevel.umd.js",
   "module": "dist/offcanvas-multilevel.esm.js",
   "types": "offcanvas-multilevel.d.ts",
+  "keywords": [
+    "jquery",
+    "plugin",
+    "off-canvas",
+    "menu",
+    "mobile",
+    "navigation",
+    "multi-level",
+    "responsive",
+    "a11y",
+    "accessible",
+    "hamburger",
+    "slide menu",
+    "nested menu"
+  ],
+  "bugs": {
+    "url": "https://github.com/smhz101/ocm/issues"
+  },
   "files": [
     "dist/",
     "offcanvas-multilevel.css",

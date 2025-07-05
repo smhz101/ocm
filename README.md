@@ -13,6 +13,7 @@
 9. [Accessibility](#accessibility)
 10. [Changelog](#changelog)
 11. [License](#license)
+12. [Keywords](#keywords)
 
 ## Introduction
 
@@ -198,3 +199,7 @@ You can hook into lifecycle events via options:
 ## License
 
 _MIT License_
+
+## Keywords
+
+`jquery`, `off-canvas`, `menu`, `mobile`, `navigation`, `multi-level`, `responsive`, `a11y`, `accessibility`, `hamburger`, `slide`, `side menu`, `plugin`, `nested`, `drawer`, `touch`

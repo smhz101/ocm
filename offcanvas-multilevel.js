@@ -1,6 +1,6 @@
 /*!
  * jQuery Off-Canvas Multi-Level Menu (OCM)
- * Version:     1.3.0
+ * Version:     1.3.1
  * Author:      Muzamiml Hussain (smhz101)
  * License:     MIT
  * Repository:  https://github.com/smhz101/ocm
@@ -88,6 +88,7 @@
     closeOnEsc: true,
     closeOnOverlay: true,
     navSelector: '.main-menu',
+    headerSelector: null,
 
     // CSS classes
     containerClass: 'ocm-container',
@@ -131,7 +132,48 @@
    */
   function OffCanvasMenu($nav, opts) {
     this.settings = $.extend(true, {}, defaults, opts);
+
+    // If we're in accordion mode, override all the CSS‐class strings:
+    if (this.settings.mode === 'accordion') {
+      Object.assign(this.settings, {
+        containerClass: 'ocm-accordion-container',
+        panelClass: 'ocm-accordion-panel',
+        levelClass: 'ocm-accordion-level',
+        headerClass: 'ocm-accordion-header',
+        listClass: 'ocm-accordion-list',
+        itemClass: 'ocm-accordion-item',
+        linkClass: 'ocm-accordion-link',
+        btnClass: 'ocm-accordion-btn',
+        btnToggleClass: 'ocm-accordion-toggle',
+        btnCloseClass: 'ocm-accordion-close',
+        btnBackClass: 'ocm-accordion-back',
+        btnHomeClass: 'ocm-accordion-home',
+      });
+    }
+
     this.$nav = $nav;
+
+    // ---- ACCORDION MODE HOOK ----
+    if (this.settings.mode === 'accordion') {
+      // 1) swap hamburger → close
+      defaults.svg.hamburger = defaults.svg.close;
+
+      // 2) measure your site header
+      const headerH = $('header').first().outerHeight() || 0;
+      // expose as a CSS var for our stylesheet
+      document.documentElement.style.setProperty('--ocm-header-offset', `${headerH}px`);
+
+      // 3) add a mode-class on the container
+      // $nav.wrap('<div class="' + this.settings.containerClass + '"></div>');
+      // $nav.parent().addClass('ocm-accordion-mode');
+    }
+
+    if (this.settings.headerSelector) {
+      const hdr = $(this.settings.headerSelector).first();
+      const h = hdr.length ? hdr.outerHeight() : 0;
+      document.documentElement.style.setProperty('--ocm-header-offset', h + 'px');
+    }
+
     this.stack = [];
     this._buildTree();
     this._buildDOM();
@@ -177,19 +219,32 @@
   OffCanvasMenu.prototype._buildDOM = function () {
     var s = this.settings;
 
+    // tag mode on container for easy styling
+    this.$nav
+      .parent(`.${s.containerClass}`)
+      .addClass(s.mode === 'accordion' ? 'ocm-accordion' : 'ocm-slide');
+
     // wrap + hide original
     this.$nav.wrap('<div class="' + s.containerClass + '"></div>').hide();
 
-    // tag mode on container for easy styling
-    this.$nav
-      .parent(/* `.${s.containerClass}` */)
-      .addClass(s.mode === 'accordion' ? 'ocm-accordion' : 'ocm-slide');
-
     // hamburger toggle
+    // this.$toggle = $('<button>')
+    //   .addClass(s.btnClass + ' ' + s.btnToggleClass)
+    //   .attr('aria-label', 'Open menu')
+    //   .html(s.svg.hamburger)
+    //   .insertBefore(this.$nav);
     this.$toggle = $('<button>')
       .addClass(s.btnClass + ' ' + s.btnToggleClass)
-      .attr('aria-label', 'Open menu')
       .html(s.svg.hamburger)
+      .on('click', () => {
+        if (this.$panel.attr('aria-hidden') === 'true') {
+          this.open();
+          if (this.settings.headerSelector) this.$toggle.html(s.svg.close);
+        } else {
+          this.close();
+          if (this.settings.headerSelector) this.$toggle.html(s.svg.hamburger);
+        }
+      })
       .insertBefore(this.$nav);
 
     // backdrop
@@ -214,7 +269,7 @@
     )
       .css({
         position: 'fixed',
-        top: 0,
+        top: this.settings.headerSelector ? 'var(--ocm-header-offset)' : '0',
         bottom: 0,
         [s.side]: 0,
         width: s.width,
@@ -222,7 +277,7 @@
         color: s.textColor,
         zIndex: s.zIndex,
         overflow: 'hidden',
-        transform: s.side === 'right' ? 'translateX(100%)' : 'translateX(-100%)',
+        transform: 'translateX(100%)',
         transition: 'transform ' + s.transitionDuration + 'ms ' + s.transitionEasing,
       })
       .appendTo('body');
@@ -266,6 +321,17 @@
         .html(s.svg.close)
         .on('click', () => this.close())
         .appendTo(this.$header);
+    }
+
+    if (s.mode === 'accordion') {
+      // prepend a header‐like bar with close icon
+      const $hdr = $('<div>').addClass(s.headerClass).prependTo(this.$panel);
+      $('<button>')
+        .addClass(s.btnClass + ' ' + s.btnCloseClass)
+        .attr('aria-label', 'Close menu')
+        .html(this.settings.svg.close)
+        .on('click', () => this.close())
+        .appendTo($hdr);
     }
 
     // render menu body
@@ -422,6 +488,7 @@
     // remove inert so focusable again
     this.$panel.removeAttr('aria-hidden').removeAttr('inert').css('transform', 'translateX(0)');
     if (this.$overlay) this.$overlay.show();
+    $('body').addClass('ocm-menu-open');
     if ($.isFunction(this.settings.onOpen)) this.settings.onOpen(this);
     this.$panel.focus();
   };
@@ -440,6 +507,7 @@
     // use inert instead of aria-hidden to avoid hiding focused descendant
     this.$panel.attr('aria-hidden', 'true').attr('inert', '').css('transform', 'translateX(100%)');
     if (this.$overlay) this.$overlay.hide();
+    $('body').removeClass('ocm-menu-open');
     this.jumpTo(0);
     if ($.isFunction(this.settings.onClose)) this.settings.onClose(this);
   };

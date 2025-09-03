@@ -219,13 +219,13 @@
   OffCanvasMenu.prototype._buildDOM = function () {
     var s = this.settings;
 
-    // tag mode on container for easy styling
-    this.$nav
-      .parent(`.${s.containerClass}`)
-      .addClass(s.mode === 'accordion' ? 'ocm-accordion' : 'ocm-slide');
-
     // wrap + hide original
     this.$nav.wrap('<div class="' + s.containerClass + '"></div>').hide();
+
+    // tag mode on container for easy styling
+    this.$nav
+      .parent(/* `.${s.containerClass}` */)
+      .addClass(s.mode === 'accordion' ? 'ocm-accordion' : 'ocm-slide');
 
     // hamburger toggle
     // this.$toggle = $('<button>')
@@ -277,7 +277,7 @@
         color: s.textColor,
         zIndex: s.zIndex,
         overflow: 'hidden',
-        transform: 'translateX(100%)',
+        transform: s.side === 'right' ? 'translateX(100%)' : 'translateX(-100%)',
         transition: 'transform ' + s.transitionDuration + 'ms ' + s.transitionEasing,
       })
       .appendTo('body');

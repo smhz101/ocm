@@ -222,7 +222,7 @@
         color: s.textColor,
         zIndex: s.zIndex,
         overflow: 'hidden',
-        transform: 'translateX(100%)',
+        transform: s.side === 'right' ? 'translateX(100%)' : 'translateX(-100%)',
         transition: 'transform ' + s.transitionDuration + 'ms ' + s.transitionEasing,
       })
       .appendTo('body');

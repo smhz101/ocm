@@ -17,13 +17,13 @@ describe('OffCanvasMenu (core)', () => {
 
   test('open() shows the panel', () => {
     instance.open();
-    expect(instance.$panel.attr('aria-hidden')).toBe('false');
+    expect(instance.$panel.attr('aria-hidden')).toBeUndefined();
     expect(instance.$panel.css('transform')).toMatch(/translateX\(0\)/);
   });
 
   test('toggle() flips open/close', () => {
     instance.toggle();
-    expect(instance.$panel.attr('aria-hidden')).toBe('false');
+    expect(instance.$panel.attr('aria-hidden')).toBeUndefined();
     instance.toggle();
     expect(instance.$panel.attr('aria-hidden')).toBe('true');
   });
